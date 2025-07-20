@@ -5,8 +5,19 @@ import postgres from 'postgres';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
+const date = new Date().toISOString().split('T')[0];
+
+function getSqlClient() {
+  try {
+    return postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+  } catch (err) {
+    console.error('Failed to create Postgres client:', err);
+    throw err;
+  }
+}
+const sql = getSqlClient();
  
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+
  
 const FormSchema = z.object({
   id: z.string(),
@@ -30,6 +41,8 @@ export async function createInvoice(formData: FormData) {
     const date = new Date().toISOString().split('T')[0];
 
     try{
+      console.log({ customerId, amount, status, amountInCents, date });
+
      await sql`
     INSERT INTO invoices (customer_id, amount, status, date)
     VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
@@ -38,6 +51,7 @@ export async function createInvoice(formData: FormData) {
     console.error('Error creating invoice:', error);
     revalidatePath('/dashboard/invoices');
       redirect('/dashboard/invoices');
+}
 };
 
 export async function deleteInvoice(id: string) {
@@ -54,11 +68,13 @@ export async function updateInvoice(id: string, formData: FormData) {
  
   const amountInCents = amount * 100;
   try{ 
-  await sql`
-    UPDATE invoices
-    SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
-    WHERE id = ${id}
-  `;}
+    console.log({ customerId, amount, status, amountInCents, date });
+
+    await sql`
+      UPDATE invoices
+      SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
+      WHERE id = ${id}
+    `;}
   catch(error) {
     console.error('Error updating invoice:', error);
   }
@@ -66,4 +82,4 @@ export async function updateInvoice(id: string, formData: FormData) {
  
   revalidatePath('/dashboard/invoices');
   redirect('/dashboard/invoices');
-};
+}

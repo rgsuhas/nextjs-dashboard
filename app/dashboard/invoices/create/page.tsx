@@ -1,12 +1,11 @@
-import Form from '@/app/ui/invoices/edit-form';
+import Form from '@/app/ui/invoices/create-form';
 import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
-import { fetchInvoiceById, fetchCustomers } from '@/app/lib/data';
+import {  fetchCustomers } from '@/app/lib/data';
  
 export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   const id = params.id;
-  const [invoice, customers] = await Promise.all([
-    fetchInvoiceById(id),
+  const [customers] = await Promise.all([
     fetchCustomers(),
   ]);
   // ...
@@ -23,7 +22,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
           },
         ]}
       />
-      <Form invoice={invoice} customers={customers} />
+      <Form customers={customers} />
     </main>
   );
 }

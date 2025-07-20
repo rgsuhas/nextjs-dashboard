@@ -1,9 +1,12 @@
 {
   "private": true,
+  "type": "module",
+
   "scripts": {
     "build": "next build",
     "dev": "next dev --turbopack",
     "start": "next start"
+
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

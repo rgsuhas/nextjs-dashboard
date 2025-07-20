@@ -141,8 +141,11 @@ export async function fetchInvoicesPages(query: string) {
     throw new Error('Failed to fetch total number of invoices.');
   }
 }
+export async function fetchInvoiceById(id: string | undefined) {
+  if (!id) {
+    throw new Error('Invoice ID is undefined in fetchInvoiceById');
+  }
 
-export async function fetchInvoiceById(id: string) {
   try {
     const data = await sql<InvoiceForm[]>`
       SELECT
@@ -156,7 +159,6 @@ export async function fetchInvoiceById(id: string) {
 
     const invoice = data.map((invoice) => ({
       ...invoice,
-      // Convert amount from cents to dollars
       amount: invoice.amount / 100,
     }));
 
@@ -166,6 +168,7 @@ export async function fetchInvoiceById(id: string) {
     throw new Error('Failed to fetch invoice.');
   }
 }
+
 
 export async function fetchCustomers() {
   try {
